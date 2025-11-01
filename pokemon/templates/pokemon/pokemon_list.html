@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex - Gotta Search 'Em All!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+
+        .control-group input,
+        .control-group select,
+        .control-group button {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .stats {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 20px;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        th a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        th a:hover {
+            opacity: 0.8;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #f7fafc;
+            transform: scale(1.01);
+        }
+
+        td {
+            padding: 18px 20px;
+        }
+
+        .pokemon-id {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .pokemon-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 2px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Pokemon type colors */
+        .type-Grass { background: linear-gradient(135deg, #78C850, #5CA935); }
+        .type-Fire { background: linear-gradient(135deg, #F08030, #DD6610); }
+        .type-Water { background: linear-gradient(135deg, #6890F0, #386CEB); }
+        .type-Electric { background: linear-gradient(135deg, #F8D030, #F0C108); }
+        .type-Psychic { background: linear-gradient(135deg, #F85888, #F61C5D); }
+        .type-Ice { background: linear-gradient(135deg, #98D8D8, #69C6C6); }
+        .type-Dragon { background: linear-gradient(135deg, #7038F8, #4C08EF); }
+        .type-Dark { background: linear-gradient(135deg, #705848, #513F34); }
+        .type-Fairy { background: linear-gradient(135deg, #EE99AC, #EC6D9A); }
+        .type-Normal { background: linear-gradient(135deg, #A8A878, #8A8A59); }
+        .type-Fighting { background: linear-gradient(135deg, #C03028, #9D2721); }
+        .type-Flying { background: linear-gradient(135deg, #A890F0, #8A66EB); }
+        .type-Poison { background: linear-gradient(135deg, #A040A0, #803380); }
+        .type-Ground { background: linear-gradient(135deg, #E0C068, #D4A82F); }
+        .type-Rock { background: linear-gradient(135deg, #B8A038, #9D8A2A); }
+        .type-Bug { background: linear-gradient(135deg, #A8B820, #8D9A1B); }
+        .type-Ghost { background: linear-gradient(135deg, #705898, #554374); }
+        .type-Steel { background: linear-gradient(135deg, #B8B8D0, #9797BA); }
+
+        .stat-value {
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .no-results {
+            padding: 40px;
+            text-align: center;
+            color: #718096;
+            font-size: 1.2em;
+        }
+
+        .sort-arrow {
+            margin-left: 5px;
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Pokedex</h1>
+            <p>Gotta Search 'Em All!</p>
+        </div>
+
+        <form method="get" class="controls">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="search">Search Pokemon</label>
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           placeholder="Search by name, type, or family..."
+                           value="{{ search_query }}">
+                </div>
+
+                <div class="control-group">
+                    <label for="type">Filter by Type</label>
+                    <select id="type" name="type">
+                        <option value="">All Types</option>
+                        {% for type in all_types %}
+                        <option value="{{ type }}" {% if type == type_filter %}selected{% endif %}>{{ type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="family">Filter by Family</label>
+                    <select id="family" name="family">
+                        <option value="">All Families</option>
+                        {% for family in all_families %}
+                        <option value="{{ family }}" {% if family == family_filter %}selected{% endif %}>{{ family }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn">Apply Filters</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                Showing {{ total_count }} Pokemon
+            </div>
+        </form>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="?search={{ search_query }}&type={{ type_filter }}&family={{ family_filter }}&sort={% if sort_by == 'pokemon_id' %}-pokemon_id{% else %}pokemon_id{% endif %}">
+                                ID
+                                {% if sort_by == 'pokemon_id' %}<span class="sort-arrow">▲</span>{% endif %}
+                                {% if sort_by == '-pokemon_id' %}<span class="sort-arrow">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?search={{ search_query }}&type={{ type_filter }}&family={{ family_filter }}&sort={% if sort_by == 'name' %}-name{% else %}name{% endif %}">
+                                Name
+                                {% if sort_by == 'name' %}<span class="sort-arrow">▲</span>{% endif %}
+                                {% if sort_by == '-name' %}<span class="sort-arrow">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th>Types</th>
+                        <th>
+                            <a href="?search={{ search_query }}&type={{ type_filter }}&family={{ family_filter }}&sort={% if sort_by == 'height' %}-height{% else %}height{% endif %}">
+                                Height (m)
+                                {% if sort_by == 'height' %}<span class="sort-arrow">▲</span>{% endif %}
+                                {% if sort_by == '-height' %}<span class="sort-arrow">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?search={{ search_query }}&type={{ type_filter }}&family={{ family_filter }}&sort={% if sort_by == 'weight' %}-weight{% else %}weight{% endif %}">
+                                Weight (kg)
+                                {% if sort_by == 'weight' %}<span class="sort-arrow">▲</span>{% endif %}
+                                {% if sort_by == '-weight' %}<span class="sort-arrow">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th>Family</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if pokemon_list %}
+                        {% for pokemon in pokemon_list %}
+                        <tr>
+                            <td class="pokemon-id">#{{ pokemon.pokemon_id }}</td>
+                            <td class="pokemon-name">{{ pokemon.name }}</td>
+                            <td>
+                                {% for type in pokemon.get_types_list %}
+                                <span class="type-badge type-{{ type }}">{{ type }}</span>
+                                {% endfor %}
+                            </td>
+                            <td class="stat-value">{{ pokemon.height }}</td>
+                            <td class="stat-value">{{ pokemon.weight }}</td>
+                            <td>{{ pokemon.family }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="no-results">
+                                No Pokemon found. Try adjusting your filters!
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
