@@ -22,3 +22,7 @@ class Pokemon(models.Model):
     def get_type_badges(self):
         """Returns HTML for type badges"""
         return self.get_types_list()
+
+    def get_thumbnail_url(self):
+        """Returns the URL for the Pokemon thumbnail"""
+        return f"thumbnails/{self.pokemon_id:03d}.png"
